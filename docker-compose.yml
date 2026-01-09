@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  # 🏢 Сервіс 1: Твій додаток (Django)
+  app:
+    build: .             # Будуємо з поточної папки (де лежить Dockerfile)
+    ports:
+      - "8000:8000"      # Відкриваємо порт назовні
+    volumes:
+      - .:/app           # "Дзеркало": зміни в коді на комп'ютері відразу летять в контейнер
+    command: >           # Команда запуску (чекає поки база встане, робить міграції і запускає)
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db               # Запускати тільки після бази
+    environment:         # Змінні середовища (щоб Django знав паролі)
+      - POSTGRES_HOST=db
+      - POSTGRES_NAME=shop
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+
+  # 🗄️ Сервіс 2: База даних (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=shop
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - "5432:5432"
