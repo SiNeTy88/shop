@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Role(models.Model):
     role = models.CharField(max_length=100)
 
+#Модель та весь функціонал юзера мають бути в окремій апці
 class Users(User):
     username = User.username
     password_hash = User.password
